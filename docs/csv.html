@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSVビューア</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 4px; }
+    .highlight { background-color: #ffd; }
+  </style>
+</head>
+<body>
+  <h1>CSV 表示</h1>
+  <label>キーワード（カンマ区切り）: <input type="text" id="filterWords"></label>
+  <button onclick="filterRows()">フィルター</button>
+  <div id="csv-table"></div>
+
+  <script>
+    // 例: GitHub Pages 上に置いた元CSVを fetch
+    fetch('original.csv')
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.split('\n').map(r => r.split(','));
+        window.csvData = rows;
+        renderTable(rows);
+      });
+
+    function renderTable(rows) {
+      let html = '<table>';
+      for (let i = 0; i < rows.length; i++) {
+        html += '<tr>';
+        for (const cell of rows[i]) {
+          html += `<td>${cell}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += '</table>';
+      document.getElementById('csv-table').innerHTML = html;
+    }
+
+    function filterRows() {
+      const keywords = document.getElementById('filterWords').value.split(',').map(k => k.trim());
+      const filtered = window.csvData.filter(row =>
+        keywords.some(k => row.some(cell => cell.includes(k)))
+      );
+      renderTable(filtered.length ? filtered : [['一致なし']]);
+    }
+  </script>
+</body>
+</html>
