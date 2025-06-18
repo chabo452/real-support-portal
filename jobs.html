@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8"/>
-  <title>豎ゆｺｺ諠・ｱ</title>
+  <title>求人情報</title>
   <style>
     .match-3 { background: #f88; }
     .match-2 { background: #ff8; }
@@ -12,11 +12,11 @@
   </style>
 </head>
 <body>
-  <h1>豎ゆｺｺ諠・ｱ</h1>
-  <label>繧ｭ繝ｼ繝ｯ繝ｼ繝会ｼ医き繝ｳ繝槫玄蛻・ｊ縺ｧ譛螟ｧ3縺､・会ｼ・
-    <input id="keywords" type="text" placeholder="萓具ｼ壽擲莠ｬ,譛ｪ邨碁ｨ・鬮伜庶蜈･">
+  <h1>求人情報</h1>
+  <label>キーワード（カンマ区切りで最大3つ）：
+    <input id="keywords" type="text" placeholder="例：東京,未経験,高収入">
   </label>
-  <button onclick="applyFilter()">繝輔ぅ繝ｫ繧ｿ繝ｼ驕ｩ逕ｨ</button>
+  <button onclick="applyFilter()">フィルター適用</button>
   
   <div id="jobs"></div>
   
@@ -37,7 +37,7 @@
       }
       const filtered = jobData.map(job => {
         const text = `${job.title} ${job.company} ${job.location} ${job.salary} ${job.note}`;
-        // 譁・ｭ怜・縺ｫ繧ｭ繝ｼ繝ｯ繝ｼ繝峨′蜷ｫ縺ｾ繧後ｋ縺九き繧ｦ繝ｳ繝茨ｼ・oolean縺ｪ縺ｮ縺ｧ + 縺ｯ雜ｳ縺礼ｮ励↓縺ｪ繧具ｼ・
+        // 文字列にキーワードが含まれるかカウント（booleanなので + は足し算になる）
         const matches = kw.reduce((count, k) => count + (text.includes(k) ? 1 : 0), 0);
         return { ...job, matches };
       }).filter(j => j.matches > 0)
@@ -48,10 +48,10 @@
     function renderTable(data) {
       const div = document.getElementById('jobs');
       if (!data.length) {
-        div.innerHTML = '<p>隧ｲ蠖捺ｱゆｺｺ縺ｪ縺・/p>';
+        div.innerHTML = '<p>該当求人なし</p>';
         return;
       }
-      let html = '<table><tr><th>繧ｿ繧､繝医Ν</th><th>莨夂､ｾ</th><th>蜍､蜍吝慍</th><th>邨ｦ荳・/th><th>蛯呵・/th></tr>';
+      let html = '<table><tr><th>タイトル</th><th>会社</th><th>勤務地</th><th>給与</th><th>備考</th></tr>';
       for (const job of data) {
         const cls = `match-${job.matches}`;
         html += `<tr class="${cls}">
