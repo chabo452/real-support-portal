@@ -1,0 +1,24 @@
+{
+  "name": "real-support-portal",
+  "version": "0.0.0",
+  "private": true,
+  "homepage": "https://chabo452.github.io/real-support-portal",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d docs -r https://github.com/chabo452/real-support-portal.git"
+  },
+  "dependencies": {
+    "papaparse": "^5.5.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.1.0",
+    "gh-pages": "^6.1.1",
+    "vite": "^4.5.14"
+  }
+}
