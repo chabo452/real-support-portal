@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>CSVビューア</title>
+  <title>CSV繝薙Η繝ｼ繧｢</title>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     table { border-collapse: collapse; width: 100%; }
@@ -11,9 +11,9 @@
   </style>
 </head>
 <body>
-  <h1>CSV 表示</h1>
-  <label>キーワード（カンマ区切り）: <input type="text" id="filterWords"></label>
-  <button onclick="filterRows()">フィルター</button>
+  <h1>CSV 陦ｨ遉ｺ</h1>
+  <label>繧ｭ繝ｼ繝ｯ繝ｼ繝会ｼ医き繝ｳ繝槫玄蛻・ｊ・・ <input type="text" id="filterWords"></label>
+  <button onclick="filterRows()">繝輔ぅ繝ｫ繧ｿ繝ｼ</button>
   <div id="csv-table"></div>
 
   <script>
@@ -59,7 +59,7 @@
       const filtered = csvData.filter(row =>
         keywords.some(k => row.some(cell => cell && cell.includes(k)))
       );
-      renderTable(filtered.length ? filtered : [['該当なし']]);
+      renderTable(filtered.length ? filtered : [['隧ｲ蠖薙↑縺・]]);
     }
   </script>
 </body>
