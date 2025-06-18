@@ -21,9 +21,9 @@ jobs:
         uses: actions/configure-pages@v3
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3  # v2 → v3に更新
         with:
-          path: .  # ← gh-pages ブランチ直下すべてを対象にする
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
