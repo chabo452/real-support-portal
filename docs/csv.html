@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>CSVビューア</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     table { border-collapse: collapse; width: 100%; }
     th, td { border: 1px solid #ccc; padding: 4px; }
@@ -16,20 +17,26 @@
   <div id="csv-table"></div>
 
   <script>
-    // 例: GitHub Pages 上に置いた元CSVを fetch
+    let csvData = [];
+
     fetch('original.csv')
       .then(res => res.text())
-      .then(csv => {
-        const rows = csv.split('\n').map(r => r.split(','));
-        window.csvData = rows;
-        renderTable(rows);
+      .then(csvText => {
+        Papa.parse(csvText, {
+          header: false,
+          skipEmptyLines: true,
+          complete: function(results) {
+            csvData = results.data;
+            renderTable(csvData);
+          }
+        });
       });
 
     function renderTable(rows) {
       let html = '<table>';
-      for (let i = 0; i < rows.length; i++) {
+      for (const row of rows) {
         html += '<tr>';
-        for (const cell of rows[i]) {
+        for (const cell of row) {
           html += `<td>${cell}</td>`;
         }
         html += '</tr>';
@@ -39,11 +46,20 @@
     }
 
     function filterRows() {
-      const keywords = document.getElementById('filterWords').value.split(',').map(k => k.trim());
-      const filtered = window.csvData.filter(row =>
-        keywords.some(k => row.some(cell => cell.includes(k)))
+      const input = document.getElementById('filterWords').value.trim();
+      if (!input) {
+        renderTable(csvData);
+        return;
+      }
+      const keywords = input.split(',').map(k => k.trim()).filter(k => k.length > 0);
+      if (keywords.length === 0) {
+        renderTable(csvData);
+        return;
+      }
+      const filtered = csvData.filter(row =>
+        keywords.some(k => row.some(cell => cell && cell.includes(k)))
       );
-      renderTable(filtered.length ? filtered : [['一致なし']]);
+      renderTable(filtered.length ? filtered : [['該当なし']]);
     }
   </script>
 </body>
