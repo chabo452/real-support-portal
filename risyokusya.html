@@ -1,127 +1,83 @@
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Excel アップロード ＋ グラフ描画</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>都道府県別 離職者数と離職率グラフ</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 2em; }
-    .dropzone {
-      border: 2px dashed #999;
-      padding: 2em;
-      text-align: center;
-      color: #666;
-      cursor: pointer;
-    }
-    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f0f0f0; }
-    #chartContainer { margin-top: 2em; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    canvas { max-width: 900px; }
   </style>
 </head>
 <body>
-  <h2>Excelファイル 読み込み＆グラフ表示</h2>
-  <div id="dropzone" class="dropzone">
-    ここに Excelファイル（.xlsx）をドラッグ＆ドロップ、またはクリックして選択
-    <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
-  </div>
-  <div id="output"></div>
-  <div id="chartContainer">
-    <canvas id="chartCanvas" width="800" height="400"></canvas>
-  </div>
-
+  <h2>都道府県別 離職者数（棒グラフ）と離職率（折れ線グラフ）</h2>
+  <canvas id="chart" width="900" height="450"></canvas>
   <script>
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('fileInput');
-    const output = document.getElementById('output');
-    const ctx = document.getElementById('chartCanvas').getContext('2d');
-    let chart;
+    async function loadCSV() {
+      const response = await fetch('rishokuritsu.csv');
+      const text = await response.text();
+      const lines = text.trim().split('\n');
+      const labels = [];
+      const dataNum = [];
+      const dataRate = [];
 
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', e => {
-      e.preventDefault();
-      dropzone.style.background = '#f0f0f0';
-    });
-    dropzone.addEventListener('dragleave', () => dropzone.style.background = '');
-    dropzone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropzone.style.background = '';
-      handleFile(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
-
-    function handleFile(file) {
-      if (!file || !file.name.endsWith('.xlsx')) {
-        alert('Excelファイル（.xlsx）を選んでください');
-        return;
+      for (let i = 1; i < lines.length; i++) {
+        const [pref, numStr, rateStr] = lines[i].split(',');
+        labels.push(pref);
+        dataNum.push(parseFloat(numStr));
+        dataRate.push(parseFloat(rateStr));
       }
 
-      const reader = new FileReader();
-      reader.onload = e => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheet];
-
-        // 表示
-        const html = XLSX.utils.sheet_to_html(worksheet);
-        output.innerHTML = `<h3>${file.name}</h3>` + html;
-
-        // グラフ用データ抽出
-        const json = XLSX.utils.sheet_to_json(worksheet);
-        const labels = json.map(row => row['年'] || row['Year']);
-        const datasets = [];
-
-        const keys = Object.keys(json[0]).filter(k => k !== '年' && k !== 'Year');
-        keys.forEach(key => {
-          datasets.push({
-            label: key,
-            data: json.map(row => parseFloat(row[key]) || 0),
-            fill: false,
-            borderColor: getRandomColor(),
-            tension: 0.1
-          });
-        });
-
-        // グラフ描画
-        if (chart) chart.destroy();
-        chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: labels,
-            datasets: datasets
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: '失業率の推移（各年代）'
-              }
+      const ctx = document.getElementById('chart').getContext('2d');
+      new Chart(ctx, {
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: '離職者数（千人）',
+              data: dataNum,
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+              yAxisID: 'y1'
             },
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: {
-                  display: true,
-                  text: '失業率（%）'
-                }
-              }
+            {
+              type: 'line',
+              label: '離職率（％）',
+              data: dataRate,
+              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              yAxisID: 'y2',
+              tension: 0.3,
+              fill: false,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          stacked: false,
+          scales: {
+            y1: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: '離職者数（千人）' },
+              beginAtZero: true
+            },
+            y2: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: '離職率（％）' },
+              beginAtZero: true,
+              grid: { drawOnChartArea: false }
             }
           }
-        });
-      };
-      reader.readAsArrayBuffer(file);
+        }
+      });
     }
 
-    function getRandomColor() {
-      const r = Math.floor(Math.random() * 200);
-      const g = Math.floor(Math.random() * 200);
-      const b = Math.floor(Math.random() * 200);
-      return `rgb(${r},${g},${b})`;
-    }
+    loadCSV();
   </script>
 </body>
 </html>
