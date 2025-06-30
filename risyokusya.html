@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>都道府県別 離職者数と離職率グラフ</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    canvas { max-width: 900px; }
+  </style>
+</head>
+<body>
+  <h2>都道府県別 離職者数（棒グラフ）と離職率（折れ線グラフ）</h2>
+  <canvas id="chart" width="900" height="450"></canvas>
+  <script>
+    async function loadCSV() {
+      const response = await fetch('rishokuritsu.csv');
+      const text = await response.text();
+      const lines = text.trim().split('\n');
+      const labels = [];
+      const dataNum = [];
+      const dataRate = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const [pref, numStr, rateStr] = lines[i].split(',');
+        labels.push(pref);
+        dataNum.push(parseFloat(numStr));
+        dataRate.push(parseFloat(rateStr));
+      }
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      new Chart(ctx, {
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              type: 'bar',
+              label: '離職者数（千人）',
+              data: dataNum,
+              backgroundColor: 'rgba(75, 192, 192, 0.6)',
+              yAxisID: 'y1'
+            },
+            {
+              type: 'line',
+              label: '離職率（％）',
+              data: dataRate,
+              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              yAxisID: 'y2',
+              tension: 0.3,
+              fill: false,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          stacked: false,
+          scales: {
+            y1: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: '離職者数（千人）' },
+              beginAtZero: true
+            },
+            y2: {
+              type: 'linear',
+              position: 'right',
+              title: { display: true, text: '離職率（％）' },
+              beginAtZero: true,
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    }
+
+    loadCSV();
+  </script>
+</body>
+</html>

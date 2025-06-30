@@ -4,11 +4,15 @@ $csvUrl = "https://docs.google.com/spreadsheets/d/1L4cMgiOHxt9x5DWRH_RZH-uRxpAyB
 # 保存先パス
 $outputPath = "C:\Users\user\Desktop\real-support-portal\original.csv"
 
-# UTF-8 でバイナリ取得 → UTF8として読み込む
+# CSVをそのままバイト配列として取得
 $response = Invoke-WebRequest -Uri $csvUrl -UseBasicParsing
-$bytes = $response.Content
-$utf8 = [System.Text.Encoding]::UTF8
-$cleaned = $utf8.GetString([System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($bytes))
 
-# UTF-8 with BOMで保存（VS Code / Excel / メモ帳OK）
-[System.IO.File]::WriteAllText($outputPath, $cleaned, [System.Text.Encoding]::UTF8)
+# バイト配列として取得する場合はRawContentStreamを使うかContentをバイト配列に変換する必要あり
+# ここではRawContentStreamから読み込む方法例
+$stream = $response.RawContentStream
+$reader = New-Object System.IO.StreamReader($stream, [System.Text.Encoding]::UTF8)
+$content = $reader.ReadToEnd()
+$reader.Close()
+
+# UTF-8で書き込み（BOMあり）
+[System.IO.File]::WriteAllText($outputPath, $content, [System.Text.Encoding]::UTF8)
