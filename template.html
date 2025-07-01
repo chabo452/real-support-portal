@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ヒアリングシート（業種別）</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9f9f9;
+      padding: 30px;
+      max-width: 960px;
+      margin: auto;
+    }
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    .input-box {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    textarea.input-box {
+      height: 80px;
+    }
+    .print-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,122,255,0.5);
+    }
+    .print-btn:hover {
+      background-color: #005bb5;
+    }
+    @media print {
+      .print-btn { display: none; }
+      body { background: #fff; padding: 10mm; }
+    }
+  </style>
+</head>
+<body>
+  <h2>ヒアリングシート（業種別）</h2>
+
+  <div class="section">
+    <span class="label">推定業種：</span>
+    <div id="industry" style="font-weight:bold; font-size:18px;">読み込み中...</div>
+  </div>
+
+  <div class="section">
+    <span class="label">求人内容：</span>
+    <div id="jobText" class="input-box" style="white-space: pre-wrap;"></div>
+  </div>
+
+  <form id="hearingForm">
+    <div id="questionSection" class="section">
+      <!-- 業種に応じた質問がここに挿入されます -->
+    </div>
+    <button type="button" class="print-btn" onclick="window.print()">印刷する</button>
+  </form>
+
+  <script>
+    const jobText = decodeURIComponent(new URLSearchParams(location.search).get("job") || "");
+    document.getElementById("jobText").textContent = jobText;
+
+    let industry = "その他";
+    if (/介護|福祉/.test(jobText)) industry = "介護";
+    else if (/建設|現場/.test(jobText)) industry = "建設";
+    else if (/営業/.test(jobText)) industry = "営業";
+    else if (/事務/.test(jobText)) industry = "事務";
+    else if (/IT|エンジニア|プログラマ/.test(jobText)) industry = "IT";
+
+    document.getElementById("industry").textContent = industry;
+
+    const questionsByIndustry = {
+      "介護": [
+        {
+          q: "なぜこの雇用形態（シフト、契約等）を採用していますか？",
+          example: "例）経験者と未経験者の両方を募集したかったため"
+        },
+        {
+          q: "業務の中で特に負担の大きい作業は？",
+          example: "例）夜勤が多く体力的に厳しい"
+        },
+        {
+          q: "離職者から聞かれた声・理由は？",
+          example: "例）給与が不透明、職場の人間関係が難しい"
+        },
+        {
+          q: "職場の人員体制や教育面に課題はありますか？",
+          example: "例）新人教育の仕組みが整っていない"
+        }
+      ],
+      "建設": [
+        {
+          q: "なぜこの給与幅・求人形態を選んだのか？",
+          example: "例）経験に応じて幅を持たせている"
+        },
+        {
+          q: "実際の作業分担はどのようになっているか？",
+          example: "例）棟上げはベテランが担当、新人は補助作業"
+        },
+        {
+          q: "過去の離職者の主な理由は？",
+          example: "例）体力的に厳しい、作業内容が合わなかった"
+        },
+        {
+          q: "技能者育成や教育は行っているか？",
+          example: "例）OJT中心だがマニュアルが不足"
+        }
+      ],
+      "営業": [
+        {
+          q: "ノルマや目標設定はどのように決めているか？",
+          example: "例）チームごとに設定し、個別面談も実施"
+        },
+        {
+          q: "営業手法（訪問、電話など）の具体像は？",
+          example: "例）既存顧客訪問と新規電話営業がメイン"
+        },
+        {
+          q: "離職理由としてどんなものが多かったか？",
+          example: "例）ストレスが多く、目標達成が難しい"
+        },
+        {
+          q: "業務改善やIT活用の意向は？",
+          example: "例）営業支援ツールの導入を検討中"
+        }
+      ],
+      "事務": [
+        {
+          q: "事務業務の範囲や繁忙期について教えてください",
+          example: "例）月末月初が特に忙しい"
+        },
+        {
+          q: "社内のマニュアルや教育体制は整備されていますか？",
+          example: "例）マニュアルはあるが更新が遅れている"
+        },
+        {
+          q: "過去に起きた人間関係や体制上の課題は？",
+          example: "例）コミュニケーション不足が課題"
+        },
+        {
+          q: "改善に関心がある分野（IT支援、業務見直しなど）",
+          example: "例）会計ソフトの導入検討"
+        }
+      ],
+      "IT": [
+        {
+          q: "なぜこの募集条件（スキル・言語など）にしたか？",
+          example: "例）新規プロジェクト対応のため"
+        },
+        {
+          q: "プロジェクト体制やチームの特徴は？",
+          example: "例）アジャイル開発、リモートメイン"
+        },
+        {
+          q: "離職理由や継続の難しさは？",
+          example: "例）技術の急速な変化についていけない"
+        },
+        {
+          q: "リモートや働き方改革についてどう考えていますか？",
+          example: "例）柔軟な勤務時間を推進中"
+        }
+      ],
+      "その他": [
+        {
+          q: "なぜこの求人形態を選んだのか？",
+          example: "例）地域の事情に合わせたため"
+        },
+        {
+          q: "実際の業務分担や内容は？",
+          example: "例）チームで作業を分担"
+        },
+        {
+          q: "離職の原因になりやすい点は？",
+          example: "例）労働時間が長い"
+        },
+        {
+          q: "経営上の悩みや改善したい部分は？",
+          example: "例）採用活動の効率化"
+        }
+      ]
+    };
+
+    const section = document.getElementById("questionSection");
+    questionsByIndustry[industry].forEach((item, i) => {
+      const label = document.createElement("label");
+      label.className = "label";
+      label.textContent = `${i + 1}. ${item.q}`;
+
+      const textarea = document.createElement("textarea");
+      textarea.className = "input-box";
+      textarea.name = `answer${i + 1}`;
+      textarea.placeholder = item.example;
+
+      section.appendChild(label);
+      section.appendChild(textarea);
+    });
+  </script>
+</body>
+</html>

@@ -30,7 +30,7 @@ new Chart(ctx, {
         plugins: {
             tooltip: {
                 callbacks: {
-                    label: (ctx) =>   社
+                    label: function(ctx) { return " " + ctx.raw + " 社"; }
                 }
             },
             title: { display: true, text: "危険度別 企業数の分布" },
