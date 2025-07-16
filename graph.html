@@ -1,85 +1,51 @@
-﻿<!DOCTYPE html><html lang='ja'><head><meta charset='UTF-8'>
-<title>危険度＆業種別グラフ</title>
-<script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>危険度＆業種グラフ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body { font-family: sans-serif; padding: 20px; background: #fff; }
-canvas { max-width: 1000px; height: 500px; display: block; margin: auto; }
-.chart-container { max-width: 1100px; margin: 0 auto 40px; }
-ul { margin-top: 10px; font-size: 14px; color: #444; line-height: 1.6; }
-</style></head><body>
+canvas { max-width: 800px; height: 400px; display: block; margin: 30px auto; }
+h2 { text-align: center; }
+</style>
+</head>
+<body>
 
-<div class='chart-container'>
-  <h2>危険度別の企業数（1企業1カウント）</h2>
-  <canvas id='dangerChart'></canvas>
-  <ul>
-    <li>🟥 危険度3 = 赤背景（例: 高収入・即戦力・寮完備）</li>
-    <li>🟧 危険度2 = オレンジ背景（例: 評価不明・長時間労働）</li>
-    <li>🟦 危険度1 = 青背景（例: 離職率・マニュアルなし）</li>
-  </ul>
-</div>
+<h2>危険度別 求人件数</h2>
+<canvas id="dangerChart"></canvas>
 
-<div class='chart-container'>
-  <h2>業種別の企業数</h2>
-  <canvas id='industryChart'></canvas>
-</div>
+<h2>業種別 求人件数</h2>
+<canvas id="industryChart"></canvas>
 
 <script>
-const dangerCtx = document.getElementById('dangerChart').getContext('2d');
-new Chart(dangerCtx, {
+// 危険度グラフ
+new Chart(document.getElementById('dangerChart').getContext('2d'), {
     type: 'bar',
     data: {
-        labels: ["危険度1", "危険度2", "危険度3"],
+        labels: ["危険度1","危険度2","危険度3"],
         datasets: [{
-            label: "企業数",
-            data: [91, 5, 0],
+            label: "件数",
+            data: [106,17,0],
             backgroundColor: ["rgba(100,149,237,0.6)", "rgba(255,165,0,0.6)", "rgba(255,99,132,0.7)"]
         }]
     },
-    options: {
-        responsive: true,
-        plugins: {
-            title: { display: true, text: "危険度別 企業数の分布" },
-            legend: { display: false },
-            tooltip: {
-                callbacks: {
-                    label: function(ctx) { return " " + ctx.raw + " 社"; }
-                }
-            }
-        },
-        scales: {
-            y: { beginAtZero: true, title: { display: true, text: "企業数" } }
-        }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
 });
 
-const industryCtx = document.getElementById('industryChart').getContext('2d');
-new Chart(industryCtx, {
+// 業種グラフ
+new Chart(document.getElementById('industryChart').getContext('2d'), {
     type: 'bar',
     data: {
-        labels: ["介護", "医療・介護", "建設", "営業", "事務", "IT", "その他"],
+        labels: ["その他","医療・介護","事務","建設","介護","営業","IT"],
         datasets: [{
-            label: "企業数",
-            data: [174,74,70,93,84,31,556],
+            label: "件数",
+            data: [491,80,59,95,220,93,12],
             backgroundColor: "rgba(60,179,113,0.6)"
         }]
     },
-    options: {
-        responsive: true,
-        plugins: {
-            title: { display: true, text: "業種別 企業数の分布" },
-            legend: { display: false },
-            tooltip: {
-                callbacks: {
-                    label: function(ctx) {
-                        return " " + ctx.label + ": " + ctx.raw + " 社";
-                    }
-                }
-            }
-        },
-        scales: {
-            y: { beginAtZero: true, title: { display: true, text: "企業数" } }
-        }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
 });
 </script>
+
 </body></html>
